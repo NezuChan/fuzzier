@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/nezuchan/fuzzier/config"
 	"github.com/nezuchan/fuzzier/lib"
 )

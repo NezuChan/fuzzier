@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Redis redis.Config
+	Port  string `env:"PORT" envDefault:"3000"`
 }
 
 func Init() (conf Config, err error) {
