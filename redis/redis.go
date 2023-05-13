@@ -33,7 +33,9 @@ type Redis struct {
 	config Config
 }
 
-func InitRedis(conf Config) *Redis {
+var Client redis.UniversalClient
+
+func InitRedis(conf Config) {
 	opts := &redis.UniversalOptions{
 		Addrs: *conf.Clusters,
 		DB:    *conf.Db,
@@ -51,17 +53,15 @@ func InitRedis(conf Config) *Redis {
 		opts.PoolSize = *conf.PoolSize
 	}
 
-	client := redis.NewUniversalClient(opts)
+	Client = redis.NewUniversalClient(opts)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := client.Info(ctx).Result()
+	_, err := Client.Info(ctx).Result()
 	if err != nil {
 		panic(fmt.Sprintf("Error connecting to Redis: %s", err))
 	}
 
 	log.Infof("Connected to Redis server")
-
-	return &Redis{UniversalClient: client, config: conf}
 }

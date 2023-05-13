@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nezuchan/fuzzier/config"
 	"github.com/nezuchan/fuzzier/redis"
-	"time"
+	"github.com/nezuchan/fuzzier/routes"
 )
 
 type Fuzzy struct {
@@ -14,35 +14,29 @@ type Fuzzy struct {
 	App   *fiber.App
 }
 
-func InitFuzzy(conf *config.Config) *Fuzzy {
-	fuzzy := Fuzzy{
-		Redis: redis.InitRedis(conf.Redis),
-		App: fiber.New(
-			fiber.Config{
-				DisableStartupMessage: true,
-			}),
-	}
+func InitFuzzy() {
+	redis.InitRedis(config.Conf.Redis)
 
-	fuzzy.App.Use(
+	App := fiber.New(
+		fiber.Config{
+			DisableStartupMessage: true,
+		})
+
+	App.Use(
 		func(c *fiber.Ctx) error {
-			start := time.Now()
-
-			err := c.Next()
-
-			latency := time.Since(start)
-
-			log.Info(fmt.Sprintf("%s:%s [%d ms] %d - %s %s",
+			log.Info(fmt.Sprintf("%s:%s %d - %s %s",
 				c.IP(),
 				c.Port(),
-				latency/100,
 				c.Response().StatusCode(),
 				c.Method(),
 				c.Path(),
 			))
-			return err
+			return c.Next()
 		})
 
-	log.Fatal(fuzzy.App.Listen(fmt.Sprintf(":%s", conf.Port)))
+	App.Post("/match", routes.FuzzyMatch)
+	App.Post("/", routes.FuzzySave)
 
-	return &fuzzy
+	log.Fatal(App.Listen(fmt.Sprintf(":%s", config.Conf.Port)))
+
 }

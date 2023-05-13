@@ -7,14 +7,17 @@ import (
 )
 
 type Config struct {
-	Redis redis.Config
-	Port  string `env:"PORT" envDefault:"3000"`
+	Redis         redis.Config
+	Port          string `env:"PORT" envDefault:"3000"`
+	Authorization string `env:"AUTHORIZATION,required"`
+	RedisKey      string `env:"REDIS_KEY,required"`
 }
 
-func Init() (conf Config, err error) {
-	conf = Config{}
-	if err := env.Parse(&conf); err != nil {
+var Conf Config
+
+func Init() {
+	Conf = Config{}
+	if err := env.Parse(&Conf); err != nil {
 		log.Fatalf("%+v\n", err)
 	}
-	return conf, nil
 }
