@@ -19,7 +19,7 @@ func FuzzySave(c *fiber.Ctx) error {
 		})
 	}
 
-	var body FindMatch
+	var body []FindMatch
 	err := c.BodyParser(&body)
 	if err != nil {
 		log.Infof("Failed to parse body from client")
@@ -29,19 +29,24 @@ func FuzzySave(c *fiber.Ctx) error {
 		})
 	}
 
-	jsonBody, err := json.Marshal(body)
-	if err != nil {
-		log.Infof("Failed to marshal body to JSON: %v", err)
-		return c.Status(500).JSON(_struct.BaseJSONResponse{
-			Message: "Failed to marshal body to JSON",
-			Status:  500,
-		})
-	}
-
-	_, err = redis.Client.RPush(context.Background(), config.Conf.RedisKey, jsonBody).Result()
-
-	if err != nil {
-		log.Fatal(err)
+	for _, b := range body {
+		jsonBody, err := json.Marshal(b)
+		if err != nil {
+			log.Infof("Failed to marshal body to JSON: %v", err)
+			return c.Status(500).JSON(_struct.BaseJSONResponse{
+				Message: "Failed to marshal body to JSON",
+				Status:  500,
+			})
+		}
+	
+		_, err = redis.Client.RPush(context.Background(), config.Conf.RedisKey, jsonBody).Result()
+	
+		if err != nil {
+			c.Status(500).JSON(_struct.BaseJSONResponse{
+				Message: "Error while adding track to redis",
+				Status:  500,
+			})
+		}
 	}
 
 	return c.JSON(_struct.BaseJSONResponse{

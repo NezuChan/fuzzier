@@ -39,7 +39,7 @@ func FuzzyMatch(c *fiber.Ctx) error {
 		})
 	}
 
-	values, err := redis.Client.LRange(context.Background(), config.Conf.RedisKey, 0, -1).Result()
+	values, _ := redis.Client.LRange(context.Background(), config.Conf.RedisKey, 0, -1).Result()
 	results := make([]string, len(values))
 
 	for i, v := range values {
