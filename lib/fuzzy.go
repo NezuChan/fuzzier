@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+
 	"github.com/disgoorg/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nezuchan/fuzzier/config"
@@ -38,5 +39,4 @@ func InitFuzzy() {
 	App.Post("/", routes.FuzzySave)
 
 	log.Fatal(App.Listen(fmt.Sprintf(":%s", config.Conf.Port)))
-
 }

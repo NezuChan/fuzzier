@@ -11,6 +11,7 @@ type Config struct {
 	Port          string `env:"PORT" envDefault:"3000"`
 	Authorization string `env:"AUTHORIZATION,required"`
 	RedisKey      string `env:"REDIS_KEY,required"`
+	StoreTimeout  int    `env:"STORE_TIMEOUT" envDefault:"86400000"`
 }
 
 var Conf Config
