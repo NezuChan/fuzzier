@@ -3,8 +3,6 @@ FROM ghcr.io/hazmi35/node:18-dev-alpine as build-stage
 LABEL name "Nezu Fuzzier (Docker Build)"
 LABEL maintainer "KagChi"
 
-RUN gh-release-download.sh mikefarah/yq latest yq_linux_amd64
-
 COPY package*.json .
 
 RUN npm ci
