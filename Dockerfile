@@ -1,23 +1,29 @@
-FROM golang:1.20-alpine as build-stage
+FROM ghcr.io/hazmi35/node:18-dev-alpine as build-stage
 
-WORKDIR /tmp/build
+LABEL name "Nezu Fuzzier (Docker Build)"
+LABEL maintainer "KagChi"
+
+RUN gh-release-download.sh mikefarah/yq latest yq_linux_amd64
+
+COPY package*.json .
+
+RUN npm ci
 
 COPY . .
 
-# Build the project
-RUN go build .
+RUN npm run build
 
-FROM alpine:3
+RUN npm prune --production
 
-LABEL name "NezuChan fuzzier"
+FROM oven/bun
+
+LABEL name "Nezu Fuzzier Production"
 LABEL maintainer "KagChi"
 
-WORKDIR /app
+COPY --from=build-stage /tmp/build/package.json .
+COPY --from=build-stage /tmp/build/package-lock.json .
+COPY --from=build-stage /tmp/build/bun.lockb .
+COPY --from=build-stage /tmp/build/node_modules ./node_modules
+COPY --from=build-stage /tmp/build/dist ./dist
 
-# Install needed deps
-RUN apk add --no-cache tini
-
-COPY --from=build-stage /tmp/build/fuzzier main
-
-ENTRYPOINT ["tini", "--"]
-CMD ["/app/main"]
+CMD ["bun", "start"]
