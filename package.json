@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@bogeychan/elysia-logger": "^0.0.4",
-    "elysia": "^0.6.3",
+    "elysia": "^1.0.0",
     "pino": "^8.15.0",
     "pino-pretty": "^10.2.0",
     "redis": "^4.6.7",
